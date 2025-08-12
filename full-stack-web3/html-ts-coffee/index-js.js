@@ -2,8 +2,9 @@ import {createWalletClient, custom, createPublicClient, parseEther, defineChain}
 import { contractAddress, abi } from "./constants-js.js";
 
 
-const connectButton = document.getElementById('connectButton');
-const fundButton = document.getElementById('fundButton');
+const connectButton = document.getElementById('connectButton').addEventListener("click", connect);
+const fundButton = document.getElementById('fundButton').addEventListener("click", fund);
+const getBalanceButton = document.getElementById('balanceButton').addEventListener("click", getBalance);
 const ethAmountInput = document.getElementById('ethAmount');
 
 let walletClient
@@ -47,21 +48,29 @@ async function fund() {
 
         console.log(parseEther(ethAmount));
 
-        // await publicClient.simulateContract({
-        //     //address, abi
-        //     address : contractAddress,
-        //     abi: abi,
-        //     functionName: 'fund',
-        //     account: connectedAccount,
-        //     chain: currentChain, 
-        //     value:parseEther(ethAmount),
-        // })
+        const {request} = await publicClient.simulateContract({
+            //address, abi
+            address : contractAddress,
+            abi: abi,
+            functionName: 'fund',
+            account: connectedAccount,
+            chain: currentChain, 
+            value:parseEther(ethAmount),
+        })
+
+        // console.log({request});
+        const txHash = await walletClient.writeContract(request);
+        console.log(`Transaction sent: ${txHash}`);
 
 
     
     } else {
         connectButton.innerText = "Please install a wallet extension like MetaMask";
     }
+}
+
+async function getBalance(){
+    //get balance logic goes here 
 }
 
 async function getCurrentChain  (client){
